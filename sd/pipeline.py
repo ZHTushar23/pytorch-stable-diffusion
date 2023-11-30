@@ -8,6 +8,9 @@ HEIGHT = 512
 LATENTS_WIDTH = WIDTH // 8
 LATENTS_HEIGHT = HEIGHT // 8
 
+# cfg = classifier free guidance, cfg weight=[1,14]
+# n_inference_steps = no of steps to take during inference
+# generate is the inference function
 def generate(
     prompt,
     uncond_prompt=None,

@@ -1,6 +1,7 @@
 import torch
 import numpy as np
 
+# This removes noise and add noise, it is the sampler.
 class DDPMSampler:
 
     def __init__(self, generator: torch.Generator, num_training_steps=1000, beta_start: float = 0.00085, beta_end: float = 0.0120):
@@ -8,15 +9,17 @@ class DDPMSampler:
         # For the naming conventions, refer to the DDPM paper (https://arxiv.org/pdf/2006.11239.pdf)
         self.betas = torch.linspace(beta_start ** 0.5, beta_end ** 0.5, num_training_steps, dtype=torch.float32) ** 2
         self.alphas = 1.0 - self.betas
-        self.alphas_cumprod = torch.cumprod(self.alphas, dim=0)
+        self.alphas_cumprod = torch.cumprod(self.alphas, dim=0) # cumilative product[a0,a0*a1,a0*a1*a2]
         self.one = torch.tensor(1.0)
 
         self.generator = generator
 
         self.num_train_timesteps = num_training_steps
-        self.timesteps = torch.from_numpy(np.arange(0, num_training_steps)[::-1].copy())
+        self.timesteps = torch.from_numpy(np.arange(0, num_training_steps)[::-1].copy()) # reverse time step
 
     def set_inference_timesteps(self, num_inference_steps=50):
+        # 99,998,997,...0 =1000 steps by default
+        # 999,999-20,999-40,....=50 steps
         self.num_inference_steps = num_inference_steps
         step_ratio = self.num_train_timesteps // self.num_inference_steps
         timesteps = (np.arange(0, num_inference_steps) * step_ratio).round()[::-1].copy().astype(np.int64)
@@ -45,7 +48,7 @@ class DDPMSampler:
     
     def set_strength(self, strength=1):
         """
-            Set how much noise to add to the input image. 
+            Set how much noise to add to the input image. latent image 0.8 is a good value.
             More noise (strength ~ 1) means that the output will be further from the input image.
             Less noise (strength ~ 0) means that the output will be closer to the input image.
         """
@@ -54,6 +57,8 @@ class DDPMSampler:
         self.timesteps = self.timesteps[start_step:]
         self.start_step = start_step
 
+
+    # model_output is the predicted noise. This function removes noise from the image
     def step(self, timestep: int, latents: torch.Tensor, model_output: torch.Tensor):
         t = timestep
         prev_t = self._get_previous_timestep(t)
@@ -92,7 +97,7 @@ class DDPMSampler:
         pred_prev_sample = pred_prev_sample + variance
 
         return pred_prev_sample
-    
+    # adds noise at a particular timestep
     def add_noise(
         self,
         original_samples: torch.FloatTensor,
@@ -103,6 +108,8 @@ class DDPMSampler:
 
         sqrt_alpha_prod = alphas_cumprod[timesteps] ** 0.5
         sqrt_alpha_prod = sqrt_alpha_prod.flatten()
+
+        # to match dimension with the image
         while len(sqrt_alpha_prod.shape) < len(original_samples.shape):
             sqrt_alpha_prod = sqrt_alpha_prod.unsqueeze(-1)
 

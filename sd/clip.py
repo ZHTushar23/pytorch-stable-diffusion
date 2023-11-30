@@ -94,3 +94,8 @@ class CLIP(nn.Module):
         output = self.layernorm(state)
         
         return output
+
+if __name__=="__main__":
+    x = torch.rand(128, 77).to(torch.long)
+    angle_embed = CLIP()
+    print(angle_embed(x).shape)
