@@ -1,6 +1,6 @@
 Traceback (most recent call last):
-  File "/nfs/rs/psanjay/users/ztushar1/pytorch-stable-diffusion/sd/dm_diffusion.py", line 364, in <module>
-    print(model(x,context,t).shape)
+  File "/nfs/rs/psanjay/users/ztushar1/pytorch-stable-diffusion/sd/dm_diffusion.py", line 389, in <module>
+    print(model(input_image_tensor,context,t).shape)
   File "/home/ztushar1/.conda/envs/df/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1518, in _wrapped_call_impl
     return self._call_impl(*args, **kwargs)
   File "/home/ztushar1/.conda/envs/df/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1527, in _call_impl
@@ -29,8 +29,6 @@ Traceback (most recent call last):
     return self._call_impl(*args, **kwargs)
   File "/home/ztushar1/.conda/envs/df/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1527, in _call_impl
     return forward_call(*args, **kwargs)
-  File "/nfs/rs/psanjay/users/ztushar1/pytorch-stable-diffusion/sd/attention.py", line 50, in forward
-    weight = F.softmax(weight, dim=-1) 
-  File "/home/ztushar1/.conda/envs/df/lib/python3.10/site-packages/torch/nn/functional.py", line 1856, in softmax
-    ret = input.softmax(dim)
-torch.cuda.OutOfMemoryError: CUDA out of memory. Tried to allocate 12.81 GiB. GPU 0 has a total capacty of 23.64 GiB of which 6.17 GiB is free. Including non-PyTorch memory, this process has 17.47 GiB memory in use. Of the allocated memory 16.37 GiB is allocated by PyTorch, and 90.08 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting max_split_size_mb to avoid fragmentation.  See documentation for Memory Management and PYTORCH_CUDA_ALLOC_CONF
+  File "/nfs/rs/psanjay/users/ztushar1/pytorch-stable-diffusion/sd/attention.py", line 37, in forward
+    weight = q @ k.transpose(-1, -2)
+torch.cuda.OutOfMemoryError: CUDA out of memory. Tried to allocate 2048.00 GiB. GPU 0 has a total capacty of 23.64 GiB of which 14.97 GiB is free. Including non-PyTorch memory, this process has 8.67 GiB memory in use. Of the allocated memory 7.61 GiB is allocated by PyTorch, and 49.67 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting max_split_size_mb to avoid fragmentation.  See documentation for Memory Management and PYTORCH_CUDA_ALLOC_CONF

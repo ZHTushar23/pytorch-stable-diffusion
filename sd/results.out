@@ -1,2 +1,3 @@
 Using device: cuda
+The tensor is on device: cuda:0
 (512, 512, 3)

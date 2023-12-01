@@ -347,18 +347,43 @@ class Diffusion(nn.Module):
         
         # (Batch, 4, Height / 8, Width / 8)
         return output
-
+def rescale(x, old_range, new_range, clamp=False):
+    old_min, old_max = old_range
+    new_min, new_max = new_range
+    x -= old_min
+    x *= (new_max - new_min) / (old_max - old_min)
+    x += new_min
+    if clamp:
+        x = x.clamp(new_min, new_max)
+    return x
 if __name__=="__main__":
+    from PIL import Image
+    import numpy as np
+    WIDTH, HEIGHT=512,512
     device = torch.device('cuda') if torch.cuda.is_available() else torch.device("cpu")
-    x = torch.rand(1, 1, 144, 144)
+    # x = torch.rand((1, 1, 144, 144),device=device)
+    image_path = "../images/dog.png"
+    input_image = Image.open(image_path)
+    input_image_tensor = input_image.resize((WIDTH, HEIGHT))
+    # (Height, Width, Channel)
+    input_image_tensor = np.array(input_image_tensor)
+    # (Height, Width, Channel) -> (Height, Width, Channel)
+    input_image_tensor = torch.tensor(input_image_tensor, dtype=torch.float32)
+    # (Height, Width, Channel) -> (Height, Width, Channel)
+    input_image_tensor = rescale(input_image_tensor, (0, 255), (-1, 1))
+    # (Height, Width, Channel) -> (Batch_Size, Height, Width, Channel)
+    input_image_tensor = input_image_tensor.unsqueeze(0)
+    # (Batch_Size, Height, Width, Channel) -> (Batch_Size, Channel, Height, Width)
+    input_image_tensor = input_image_tensor.permute(0, 3, 1, 2)
+    input_image_tensor = input_image_tensor.to(device)
+
+
+
     # time_embedding = TimeEmbedding(320)
-    t = torch.rand((1,320), dtype=torch.float32)
+    t = torch.rand((1,320), dtype=torch.float32, device=device)
     # time = time_embedding(t)
-    context = torch.rand(1, 77, 768)
-    model = Diffusion()
-    model.to(device)
-    x=x.to(device)
-    context = context.to(device)
-    t = t.to(device)
+    context = torch.rand((1, 77, 768),device=device)
+    model = Diffusion().to(device)
+    # t = t.to(device)
     print(f"The tensor is on device: {context.device}")
-    print(model(x,context,t).shape)
+    print(model(input_image_tensor,context,t).shape)

@@ -98,6 +98,8 @@ def generate(
             input_image_tensor = input_image_tensor.unsqueeze(0)
             # (Batch_Size, Height, Width, Channel) -> (Batch_Size, Channel, Height, Width)
             input_image_tensor = input_image_tensor.permute(0, 3, 1, 2)
+            input_image_tensor = input_image_tensor.to(device)
+            print(f"The tensor is on device: {input_image_tensor.device}")
 
             # (Batch_Size, 4, Latents_Height, Latents_Width)
             encoder_noise = torch.randn(latents_shape, generator=generator, device=device)
@@ -107,7 +109,7 @@ def generate(
             # Add noise to the latents (the encoded input image)
             # (Batch_Size, 4, Latents_Height, Latents_Width)
             sampler.set_strength(strength=strength)
-            latents = sampler.add_noise(latents, sampler.timesteps[0])
+            latents,_ = sampler.add_noise(latents, sampler.timesteps[0])
 
             to_idle(encoder)
         else:

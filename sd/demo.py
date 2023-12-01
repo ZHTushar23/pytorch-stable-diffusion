@@ -32,8 +32,8 @@ cfg_scale = 8  # min: 1, max: 14 # attention level
 
 input_image = None
 # Comment to disable image to image
-image_path = "../images/dog.jpg"
-# input_image = Image.open(image_path)
+image_path = "../images/dog.png"
+input_image = Image.open(image_path)
 # Higher values means more noise will be added to the input image, so the result will further from the input image.
 # Lower values means less noise is added to the input image, so output will be closer to the input image.
 strength = 0.9
