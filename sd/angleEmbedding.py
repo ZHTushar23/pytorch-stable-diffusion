@@ -1,8 +1,4 @@
 import torch
-
-
-
-
 class Embedder:
     def __init__(self, **kwargs):
         self.kwargs = kwargs
@@ -41,7 +37,7 @@ def get_embedder(multires, i=0):
         return nn.Identity(), 3
     
     embed_kwargs = {
-                'include_input' : True,
+                'include_input' : False,
                 'input_dims' :1,
                 'max_freq_log2' : multires-1,
                 'num_freqs' : multires,
@@ -53,9 +49,18 @@ def get_embedder(multires, i=0):
     embed = lambda x, eo=embedder_obj : eo.embed(x)
     return embed, embedder_obj.out_dim
 
+
 if __name__=="__main__":
-    sza              = torch.tensor([60])
-    embed, embedder_obj_out_dim=get_embedder(38)
+    sza              = torch.tensor([-60])
+    embed, embedder_obj_out_dim=get_embedder(5)
     sza_emb = embed(sza)
     # sza_emb = torch.unsqueeze(sza_emb.reshape(2,50),0)
     print(sza_emb.shape)
+    print(sza_emb)
+
+    sza              = torch.tensor([60])
+    embed, embedder_obj_out_dim=get_embedder(5)
+    sza_emb = embed(sza)
+    # sza_emb = torch.unsqueeze(sza_emb.reshape(2,50),0)
+    print(sza_emb.shape)
+    print(sza_emb)

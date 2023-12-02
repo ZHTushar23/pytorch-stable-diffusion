@@ -163,3 +163,10 @@ data/
 images/
 
 .DS_Store
+sd/model.err
+sd/model.out
+
+sd/results.err
+sd/results.out
+sd/DMTrain.err
+sd/DMTrain.out

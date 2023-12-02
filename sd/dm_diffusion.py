@@ -347,15 +347,7 @@ class Diffusion(nn.Module):
         
         # (Batch, 4, Height / 8, Width / 8)
         return output
-def rescale(x, old_range, new_range, clamp=False):
-    old_min, old_max = old_range
-    new_min, new_max = new_range
-    x -= old_min
-    x *= (new_max - new_min) / (old_max - old_min)
-    x += new_min
-    if clamp:
-        x = x.clamp(new_min, new_max)
-    return x
+
 if __name__=="__main__":
     from PIL import Image
     import numpy as np

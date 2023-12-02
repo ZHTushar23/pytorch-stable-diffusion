@@ -5,6 +5,17 @@ from tqdm import tqdm
 from ddpm import DDPMSampler
 from dm_diffusion import Diffusion
 from torch.optim import Adam,SGD, lr_scheduler
+  
+
+
+
+
+#parameters
+root_data_dir = "/nfs/rs/psanjay/users/ztushar1/pytorch-stable-diffusion/data/LES_vers1_multiangle_results/"
+batch_size = 1
+Seq_Len    = 2    # 77
+Dim        = 100  # 768
+L          = 50   # Dim will be 100
 
 device = torch.device('cuda') if torch.cuda.is_available() else torch.device("cpu")
 # initialize sampler
@@ -16,7 +27,22 @@ sampler = DDPMSampler(generator)
 model = Diffusion()
 
 # initialize dataloader
+# Create an instance of your custom dataset
+custom_dataset = NasaDataset(root_data_dir)
 
+# Define the sizes for train, validation, and test sets
+total_size = len(custom_dataset)
+test_size = int(0.2 * total_size)
+# Use random_split to split the dataset
+train_data, test_data = random_split(
+    custom_dataset, [total_size - test_size, test_size]
+)
+
+test_data = NasaDataset(test_data_dir)
+
+train_loader = DataLoader(train_data, batch_size=batch_size,shuffle=True)
+# valid_loader = DataLoader(valid_data, batch_size=batch_size,shuffle=False)
+test_loader = DataLoader(test_data, batch_size=batch_size,shuffle=False)
 
 # specify optimizer functions
 lr=0.0001
@@ -32,15 +58,28 @@ for epoch in range(1, n_epochs + 1):
     model.to(device)
     model.train() # prep model for training
     for _, data in enumerate(train_loader, 1):
-        X_train, Y_train, angles = data['cot'], data['reflectance']
-        
-        # Y_train = torch.unsqueeze(Y_train,1)
+        # X:(Batch Size, 1, height, width )
+        # Y:(Batch Size, nsza, nvza, 2, height, width )
+        X_train, Y_train, context = data['cot'], data['reflectance'],data['angles']
         # Move tensor to the proper device
         X_train = X_train.to(device,dtype=torch.float)
         Y_train = Y_train.to(device,dtype=torch.float)
 
-        # get context
-        context = AngleEmbedding(angles)
+        # # New Loop For angles
+        # SZA= torch.tensor([60., 40., 20.,  4.])
+        # VZA= torch.tensor([ 60,  30,  15,   0, -15, -30, -60])
+
+        # for s in range(len(SZA)):
+        #     for v in range(len(VZA)):
+        #         Y_train  = Y[:,s,v,:,:]
+        #         # Y_train = torch.unsqueeze(Y_train,1)
+        #         # Move tensor to the proper device
+        #         Y_train = Y_train.to(device,dtype=torch.float)
+
+        #         # get context
+        #         # (Batch_Size, Seq_Len) -> (Batch_Size, Seq_Len, Dim)
+        #         sza_emb,vza_emb = embed(SZA[s]),embed(VZA[v])
+        #         context = torch.concat((sza_emb.unsqueeze(1),vza_emb.unsqueeze(1)),dim=1)
 
         # sample timestep
         timesteps = tqdm(sampler.timesteps)
@@ -48,10 +87,11 @@ for epoch in range(1, n_epochs + 1):
         # get time embedding
         # (1, 320)
         time_embedding = get_time_embedding(timesteps).to(device)
+        print(time_embedding.shape)
         
         # add noise
         X_train_noisy, Only_noise = sampler.add_noise(X_train, sampler.timesteps[0])
-        
+
         # forward pass
         # model_output is the predicted noise
         # (Batch_Size, 4, Latents_Height, Latents_Width) -> (Batch_Size, 4, Latents_Height, Latents_Width)
