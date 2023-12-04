@@ -54,7 +54,7 @@ def check_parameters(model):
     return True
 
 if __name__=="__main__":
-    x = torch.rand(128, 2, 10, 10)
+    x = torch.rand(128, 2, 144, 144)
     model = CAM(in_channels=2,gate_channels=64)
     # print(model)
     num_params = sum(p.numel() for p in model.parameters() if p.requires_grad)

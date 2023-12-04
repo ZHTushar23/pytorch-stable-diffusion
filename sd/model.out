@@ -1,1 +1,2 @@
 The tensor is on device: cuda:0
+torch.Size([1, 4, 72, 72])

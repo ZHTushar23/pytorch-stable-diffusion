@@ -62,7 +62,8 @@ class NasaDataset(Dataset):
         # VZA = np.nan_to_num(np.array(hf.get("VZA"))) 
 
         # (Batch_Size, Seq_Len) -> (Batch_Size, Seq_Len, Dim)
-        sza_emb,vza_emb = self.embed(SZA[3]),self.embed(VZA[3])
+        sza_emb = self.embed(torch.tensor([SZA[3]]))
+        vza_emb = self.embed(torch.tensor([VZA[3]]))
         context = torch.concat((sza_emb.unsqueeze(1),vza_emb.unsqueeze(1)),dim=1)
 
         # print("SZA: ",sza)

@@ -347,3 +347,20 @@ class Diffusion(nn.Module):
         
         # (Batch, 4, Height / 8, Width / 8)
         return output
+
+if __name__=="__main__":
+    # x = torch.rand(128, 2, 144, 144)
+    # model = Diffusion()
+    # # print(model)
+    # num_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
+    # print("Number of parameters: {:,}".format(num_params))
+    device = torch.device('cuda') if torch.cuda.is_available() else torch.device("cpu")  
+    x = torch.rand((1, 4, 72, 72),device=device)
+    # time_embedding = TimeEmbedding(320)
+    t = torch.rand((1,320), dtype=torch.float32, device=device)
+    # time = time_embedding(t)
+    context = torch.rand((1, 77, 768),device=device)
+    model = Diffusion().to(device)
+    # t = t.to(device)
+    print(f"The tensor is on device: {context.device}")
+    print(model(x,context,t).shape)
