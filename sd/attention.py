@@ -78,6 +78,7 @@ class CrossAttention(nn.Module):
         # x (latent): # (Batch_Size, Seq_Len_Q, Dim_Q)
         # y (context): # (Batch_Size, Seq_Len_KV, Dim_KV) = (Batch_Size, 77, 768)
 
+
         input_shape = x.shape
         batch_size, sequence_length, d_embed = input_shape
         # Divide each embedding of Q into multiple heads such that d_heads * n_heads = Dim_Q
@@ -94,6 +95,7 @@ class CrossAttention(nn.Module):
         q = q.view(interim_shape).transpose(1, 2) 
         # (Batch_Size, Seq_Len_KV, Dim_Q) -> (Batch_Size, Seq_Len_KV, H, Dim_Q / H) -> (Batch_Size, H, Seq_Len_KV, Dim_Q / H)
         k = k.view(interim_shape).transpose(1, 2) 
+
         # (Batch_Size, Seq_Len_KV, Dim_Q) -> (Batch_Size, Seq_Len_KV, H, Dim_Q / H) -> (Batch_Size, H, Seq_Len_KV, Dim_Q / H)
         v = v.view(interim_shape).transpose(1, 2) 
         
